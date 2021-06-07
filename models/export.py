@@ -44,15 +44,15 @@ if __name__ == '__main__':
 
     # Load PyTorch model
     device = select_device(opt.device)
+    assert not (opt.device.lower() == 'cpu' and opt.half), '--half only compatible with GPU export, i.e. use --device 0'
     model = attempt_load(opt.weights, map_location=device)  # load FP32 model
     labels = model.names
 
-    # Checks
+    # Set grid size
     gs = int(max(model.stride))  # grid size (max stride)
-    opt.img_size = [check_img_size(x, gs) for x in opt.img_size]  # verify img_size are gs-multiples
-    assert not (opt.device.lower() == 'cpu' and opt.half), '--half only compatible with GPU export, i.e. use --device 0'
-
+    
     # Input
+    opt.img_size = [check_img_size(x, gs) for x in opt.img_size]  # verify img_size are gs-multiples
     img = torch.zeros(opt.batch_size, 3, *opt.img_size).to(device)  # image size(1,3,320,192) iDetection
 
     # Update model
